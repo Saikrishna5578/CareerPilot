@@ -60,7 +60,7 @@
 ## 📁 Project Structure
 
 ```
-Roadmap/
+CareerPilot/
 ├── frontend-web/               # React + Vite SPA
 │   ├── src/
 │   │   ├── App.jsx             # Root component — global state, auth, routing
