@@ -30,8 +30,7 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "https://careerpilot-backend-bawz.onrender.com",
-        "http://192.168.29.207:3000/"# Replace with your actual deployment URL
+        "*",# Replace with your actual deployment URL
     ],
     allow_credentials=True,
     allow_methods=["*"],
