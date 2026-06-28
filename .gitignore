@@ -1,0 +1,58 @@
+# ==========================================
+# CareerTrack & Learn — .gitignore
+# ==========================================
+
+# ---- Environment & Secrets ----
+.env
+.env.local
+.env.production
+.env.*.local
+backend/.env
+
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+venv/
+.venv/
+env/
+*.pyo
+*.pyd
+.Python
+
+# ---- Node / Frontend ----
+node_modules/
+frontend-web/node_modules/
+frontend-web/dist/
+frontend-web/.vite/
+.vite/
+
+# ---- Logs ----
+*.log
+backend/logs/
+logs/
+
+# ---- OS ----
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ---- IDE / Editor ----
+.vscode/
+.idea/
+*.swp
+*.swo
+*.sublime-project
+*.sublime-workspace
+
+# ---- Playwright ----
+playwright-report/
+test-results/
+
+# ---- Misc ----
+*.zip
+*.tar.gz
+scratch/
