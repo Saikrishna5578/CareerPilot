@@ -3,6 +3,7 @@ import JobCard from './JobCard';
 import EditJobModal from './EditJobModal';
 import ResumeUpload from './ResumeUpload';
 import { supabase } from '../../utils/supabaseClient';
+import { apiFetch } from '../../utils/api';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
@@ -67,7 +68,7 @@ export default function KanbanBoard({
         try {
           const { data: { user } } = await supabase.auth.getUser();
           if (user) {
-            await fetch(`${API}/api/applications/${jobId}?user_id=${user.id}`, {
+            await apiFetch(`/api/applications/${jobId}?user_id=${user.id}`, {
               method: "DELETE"
             });
           }
@@ -93,7 +94,7 @@ export default function KanbanBoard({
       try {
         const { data: { user } } = await supabase.auth.getUser();
         if (user) {
-          await fetch(`${API}/api/applications/${updatedJob.id}`, {
+          await apiFetch(`/api/applications/${updatedJob.id}`, {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -401,7 +402,7 @@ export default function KanbanBoard({
                   supabase.auth.getUser().then(async ({ data: { user } }) => {
                     if (user) {
                       try {
-                        const response = await fetch(`${API}/api/applications`, {
+                        const response = await apiFetch('/api/applications', {
                           method: "POST",
                           headers: { "Content-Type": "application/json" },
                           body: JSON.stringify({

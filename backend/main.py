@@ -1,7 +1,8 @@
 import os
 import logging
 from typing import List, Optional
-from fastapi import FastAPI, HTTPException, BackgroundTasks, Header, Request
+from fastapi import FastAPI, HTTPException, BackgroundTasks, Header, Request, Depends
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from dotenv import load_dotenv
@@ -83,6 +84,24 @@ SUPABASE_URL = os.getenv("SUPABASE_URL", "")
 SUPABASE_SERVICE_ROLE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY", "")
 
 supabase_client: Optional[Client] = None
+
+security = HTTPBearer()
+
+def verify_token(credentials: HTTPAuthorizationCredentials = Depends(security)):
+    """
+    Verifies the JWT token from the Authorization header against Supabase.
+    """
+    token = credentials.credentials
+    if not supabase_client:
+        return {"id": "offline-user", "email": "offline@careerpilot.com"}
+    try:
+        user_res = supabase_client.auth.get_user(token)
+        if user_res and user_res.user:
+            return user_res.user
+        raise HTTPException(status_code=401, detail="Invalid token")
+    except Exception as e:
+        raise HTTPException(status_code=401, detail=f"Authentication failed: {str(e)}")
+
 if SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY:
     try:
         supabase_client = create_client(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
@@ -140,7 +159,7 @@ def read_root():
 
 
 @app.get("/api/jobs")
-def get_jobs(query: Optional[str] = None):
+def get_jobs(query: Optional[str] = None, user: dict = Depends(verify_token)):
     """
     Returns job listings. Fetches from Supabase if connected,
     otherwise returns a mock list of jobs.
@@ -186,7 +205,7 @@ def get_jobs(query: Optional[str] = None):
 
 
 @app.post("/api/roadmap/generate")
-async def generate_user_roadmap(profile_data: UserProfileInput):
+async def generate_user_roadmap(profile_data: UserProfileInput, user: dict = Depends(verify_token)):
     """
     Triggers Gemini AI to create a tailored learning roadmap based on user goal, language, and interests,
     registers it under their profile, and inserts individual weeks into roadmap_items.
@@ -303,7 +322,7 @@ class FrontendLogInput(BaseModel):
     payload: Optional[dict] = None
 
 @app.post("/api/logs")
-def post_frontend_log(log_input: FrontendLogInput):
+def post_frontend_log(log_input: FrontendLogInput, user: dict = Depends(verify_token)):
     """
     Allows the frontend to POST errors or messages to the central database logging table.
     """
@@ -317,7 +336,7 @@ def post_frontend_log(log_input: FrontendLogInput):
 
 
 @app.post("/api/scraper/trigger")
-async def trigger_job_scraper(request_data: TriggerScraperRequest):
+async def trigger_job_scraper(request_data: TriggerScraperRequest, user: dict = Depends(verify_token)):
     """
     Runs the scraper synchronously to query job listings matching user's specific preferences,
     writes them to 'job_listings' table in the database, tags them as new/old, and returns them.
@@ -394,7 +413,7 @@ async def trigger_job_scraper(request_data: TriggerScraperRequest):
 
 
 @app.get("/api/applications")
-def get_user_applications(user_id: str):
+def get_user_applications(user_id: str, user: dict = Depends(verify_token)):
     """
     Retrieves all job applications for a specific user, parses notes JSON, and returns them.
     """
@@ -446,7 +465,7 @@ def get_user_applications(user_id: str):
         return []
 
 @app.post("/api/applications")
-def create_job_application(payload: JobApplicationInput):
+def create_job_application(payload: JobApplicationInput, user: dict = Depends(verify_token)):
     """
     Creates a new job application under job_applications table.
     """
@@ -493,7 +512,7 @@ def create_job_application(payload: JobApplicationInput):
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.put("/api/applications/{app_id}")
-def update_job_application(app_id: str, payload: JobApplicationUpdateInput):
+def update_job_application(app_id: str, payload: JobApplicationUpdateInput, user: dict = Depends(verify_token)):
     """
     Updates an existing job application.
     """
@@ -524,7 +543,7 @@ def update_job_application(app_id: str, payload: JobApplicationUpdateInput):
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.delete("/api/applications/{app_id}")
-def delete_job_application(app_id: str, user_id: str):
+def delete_job_application(app_id: str, user_id: str, user: dict = Depends(verify_token)):
     """
     Deletes a job application.
     """
@@ -539,7 +558,10 @@ def delete_job_application(app_id: str, user_id: str):
 
 
 @app.post("/api/notifications/remind-4h")
-async def check_and_send_reminders():
+async def check_and_send_reminders(x_cron_token: Optional[str] = Header(None)):
+    cron_secret = os.getenv("CRON_SECRET", "default_cron_secret")
+    if x_cron_token != cron_secret:
+        raise HTTPException(status_code=403, detail="Unauthorized cron request")
     """
     Utility task that checks users' active learning progress.
     Can be run by an external scheduler (like cron or AWS EventBridge) every 4 hours.
@@ -623,7 +645,7 @@ mock_feature_flags = {
 }
 
 @app.get("/api/admin/stats")
-def get_admin_stats():
+def get_admin_stats(user: dict = Depends(verify_token)):
     """
     Gathers metrics and API hits statistics.
     """
@@ -679,7 +701,7 @@ def get_admin_stats():
     return stats
 
 @app.get("/api/admin/features")
-def get_feature_flags():
+def get_feature_flags(user: dict = Depends(verify_token)):
     if not supabase_client:
         return [
             {"key": k, "name": v["name"], "description": v["description"], "enabled": v["enabled"]}
@@ -696,7 +718,7 @@ def get_feature_flags():
         ]
 
 @app.post("/api/admin/features")
-def update_feature_flag(flag_input: FeatureFlagInput):
+def update_feature_flag(flag_input: FeatureFlagInput, user: dict = Depends(verify_token)):
     if not supabase_client:
         if flag_input.key in mock_feature_flags:
             mock_feature_flags[flag_input.key]["enabled"] = flag_input.enabled

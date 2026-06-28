@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from './utils/supabaseClient';
+import { apiFetch } from './utils/api';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
@@ -35,7 +36,7 @@ const initialMockApplications = [];
 // Centralized Frontend DB Logger Post Helper
 const logFrontendEvent = async (severity, message, payload = {}) => {
   try {
-    await fetch(`${API}/api/logs`, {
+    await apiFetch('/api/logs', {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -232,7 +233,7 @@ export default function App() {
   // Fetch feature flags on load
   const fetchFeatureFlags = async () => {
     try {
-      const response = await fetch(`${API}/api/admin/features`);
+      const response = await apiFetch('/api/admin/features');
       if (response.ok) {
         const data = await response.json();
         if (data && data.length > 0) {
@@ -253,7 +254,7 @@ export default function App() {
     setFeatureFlags(prev => prev.map(f => f.key === key ? { ...f, enabled } : f));
     
     try {
-      const response = await fetch(`${API}/api/admin/features`, {
+      const response = await apiFetch('/api/admin/features', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ key, enabled })
@@ -404,7 +405,7 @@ export default function App() {
         }
 
         // Load applications from backend API
-        const appResponse = await fetch(`${API}/api/applications?user_id=${currentUser.id}`);
+        const appResponse = await apiFetch(`/api/applications?user_id=${currentUser.id}`);
         if (appResponse.ok) {
           const parsedApps = await appResponse.json();
           setApplications(parsedApps);
@@ -436,9 +437,9 @@ export default function App() {
   const fetchJobs = async (searchQuery) => {
     try {
       const url = searchQuery 
-        ? `${API}/api/jobs?query=${encodeURIComponent(searchQuery)}`
-        : `${API}/api/jobs`;
-      const response = await fetch(url);
+        ? `/api/jobs?query=${encodeURIComponent(searchQuery)}`
+        : `/api/jobs`;
+      const response = await apiFetch(url);
       if (response.ok) {
         const data = await response.json();
         setJobFeed(data || []);
@@ -469,7 +470,7 @@ export default function App() {
     logFrontendEvent("INFO", "Requested roadmap generation.", { career_goal: careerGoal, language: language, interests: interests });
 
     try {
-      const response = await fetch(`${API}/api/roadmap/generate`, {
+      const response = await apiFetch('/api/roadmap/generate', {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -562,7 +563,7 @@ export default function App() {
       setJobFeed([]);
       setScraperLoading(true);
 
-      const response = await fetch(`${API}/api/scraper/trigger`, {
+      const response = await apiFetch('/api/scraper/trigger', {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -632,7 +633,7 @@ Please adjust your parameters in the search form (e.g. modify required skills or
 
     if (supabase && user) {
       try {
-        const response = await fetch(`${API}/api/applications`, {
+        const response = await apiFetch('/api/applications', {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -678,7 +679,7 @@ Please adjust your parameters in the search form (e.g. modify required skills or
   const addToFavorites = async (job) => {
     if (supabase && user) {
       try {
-        const response = await fetch(`${API}/api/applications`, {
+        const response = await apiFetch('/api/applications', {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -797,7 +798,7 @@ Please adjust your parameters in the search form (e.g. modify required skills or
     // Sync back to backend if connected
     if (supabase && user && !cardId.toString().startsWith("app-")) {
       try {
-        await fetch(`${API}/api/applications/${cardId}`, {
+        await apiFetch(`/api/applications/${cardId}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({

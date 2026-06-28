@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../utils/supabaseClient';
+import { apiFetch } from '../../utils/api';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
@@ -20,7 +21,7 @@ export default function AdminPanel({ featureFlags, onToggleFeatureFlag }) {
   const fetchStats = async () => {
     setLoadingStats(true);
     try {
-      const response = await fetch(`${API}/api/admin/stats`);
+      const response = await apiFetch('/api/admin/stats');
       if (response.ok) {
         const data = await response.json();
         setStats(data);
