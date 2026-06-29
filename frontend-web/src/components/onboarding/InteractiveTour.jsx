@@ -9,6 +9,20 @@ const TOUR_STEPS = [
     position: "center"
   },
   {
+    title: "🎓 Learning Dashboard Tab",
+    description: "This is your learning command center. Here you can configure your career goals, generate an AI-powered curriculum, view your study syllabus, and track progress stats.",
+    selector: ".nav-btn-learning",
+    tab: "learning",
+    position: "bottom"
+  },
+  {
+    title: "💼 Job Applications Tab",
+    description: "Switch to this tab to search for live software developer openings, track application pipelines on the Kanban board, and upload your master resume.",
+    selector: ".nav-btn-kanban",
+    tab: "learning",
+    position: "bottom"
+  },
+  {
     title: "🎯 Career Preferences Config",
     description: "Here you can set your target Career Goal, Preferred Programming Language, and Interests. Clicking 'Generate AI Roadmap' will trigger Gemini to immediately design a custom syllabus from beginner to industry-ready.",
     selector: ".onboarding-setup-card",

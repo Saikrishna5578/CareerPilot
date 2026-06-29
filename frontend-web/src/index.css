@@ -234,31 +234,116 @@ header {
   box-shadow: var(--shadow-neon);
 }
 
-/* Dashboard Grid Layout */
+/* Dashboard Grid Layout — single column on mobile, 2-col on desktop */
 .dashboard-grid {
   display: grid;
   grid-template-columns: 1fr;
   gap: 2rem;
+  width: 100%;
 }
 
 @media (min-width: 900px) {
   .dashboard-grid {
     grid-template-columns: 1fr 320px;
   }
+
+  /* On desktop: sidebar goes on the right (natural order) */
+  .main-curriculum { order: 1; }
+  .sidebar-group    { order: 2; }
 }
 
 .sidebar-group {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+  /* Width controlled by grid, never hardcode here */
+  width: 100%;
+  min-width: 0;
 }
 
+/* Below 900px: sidebar stacks as one column, full-width */
 @media (max-width: 899px) {
   .sidebar-group {
-    width: 100% !important;
-    min-width: 100% !important;
-    max-width: 100% !important;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
   }
+}
+
+/* Dashboard Tab Bar Navigation Styles */
+.dashboard-tabs-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  margin-bottom: 1.5rem;
+}
+
+.dashboard-tabs {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding: 0.25rem 0;
+  width: 100%;
+  scrollbar-width: none; /* Hide default scrollbars */
+  -webkit-overflow-scrolling: touch;
+}
+
+.dashboard-tabs::-webkit-scrollbar {
+  display: none; /* Hide Chrome/Safari scrollbar */
+}
+
+.tab-link {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-glass);
+  border-radius: 8px;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-weight: 600;
+  padding: 0.55rem 1.1rem;
+  font-size: 0.85rem;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.tab-link:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-main);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.tab-link.active {
+  background: rgba(139, 92, 246, 0.15);
+  border-color: var(--accent-purple);
+  color: var(--text-main);
+  box-shadow: var(--shadow-neon);
+}
+
+.tab-scroll-btn {
+  display: none; /* Hidden on desktop/tablets by default */
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-glass);
+  color: var(--text-main);
+  font-size: 1.35rem;
+  font-weight: 700;
+  cursor: pointer;
+  user-select: none;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+  line-height: 0;
+  padding-bottom: 3px; /* Visual alignment of caret */
+}
+
+.tab-scroll-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: var(--accent-purple);
+  box-shadow: var(--shadow-neon);
 }
 
 .roadmap-timeline {
@@ -413,6 +498,42 @@ header {
   gap: 1rem;
 }
 
+.svg-wrapper {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.radial-inner-label {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  pointer-events: none;
+}
+
+.percentage-number {
+  font-size: 1.5rem;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.percentage-sub {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
 .svg-circle {
   transform: rotate(-90deg);
 }
@@ -554,19 +675,35 @@ header {
   gap: 0.25rem;
 }
 
-.apply-link-btn {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid var(--border-glass);
-  padding: 0.3rem 0.6rem;
-  border-radius: 6px;
-  font-size: 0.75rem;
-  color: var(--text-main);
-  text-decoration: none;
+.scraper-feed-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  height: 38px !important;
+  border-radius: 8px !important;
+  font-size: 0.78rem !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  text-decoration: none !important;
+  box-sizing: border-box !important;
+  text-align: center !important;
+  white-space: nowrap !important;
+  line-height: normal !important;
+  padding: 0 1rem !important;
+  flex: 1 !important;
+  transition: all 0.2s ease !important;
 }
 
-.apply-link-btn:hover {
-  background: var(--accent-purple);
-  border-color: var(--accent-purple);
+.scraper-feed-btn.btn-secondary.platform-details {
+  background: rgba(255, 255, 255, 0.03) !important;
+  border: 1px solid var(--border-glass) !important;
+  color: var(--text-main) !important;
+}
+
+.scraper-feed-btn.btn-secondary.platform-details:hover {
+  background: var(--accent-purple) !important;
+  border-color: var(--accent-purple) !important;
+  box-shadow: var(--shadow-neon) !important;
 }
 
 /* Scraping Feeds panel split */
@@ -587,6 +724,12 @@ header {
 
 .feed-item:last-child {
   border-bottom: none;
+}
+
+.feed-item-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem; /* Standard design system gap between actions */
 }
 
 /* Dragging hover highlight state */
@@ -610,6 +753,7 @@ header {
   background: var(--grad-glass);
   overflow: hidden;
   transition: all 0.3s ease;
+  position: relative; /* Anchor for absolute week badge positioning */
 }
 
 .accordion-item.Completed {
@@ -617,7 +761,7 @@ header {
 }
 
 .accordion-header {
-  padding: 1.25rem;
+  padding: 1.65rem 1.25rem 1.15rem 1.25rem; /* Extra top padding to make space for absolute week tag */
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -637,13 +781,19 @@ header {
 }
 
 .week-badge-mini {
+  position: absolute;
+  top: 0;
+  left: 0;
   background: rgba(139, 92, 246, 0.15);
   color: var(--accent-purple);
   font-weight: 700;
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
-  font-size: 0.75rem;
+  padding: 0.25rem 0.6rem;
+  border-bottom-right-radius: 8px;
+  border-top-left-radius: 11px; /* Matches .accordion-item radius */
+  font-size: 0.65rem;
   text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0;
 }
 
 .accordion-item.Completed .week-badge-mini {
@@ -654,6 +804,9 @@ header {
 .accordion-title-text {
   font-size: 1.05rem;
   font-weight: 600;
+  word-break: break-word;
+  white-space: normal;
+  line-height: 1.4;
 }
 
 .status-pill {
@@ -2194,180 +2347,367 @@ header {
   }
 }
 
-/* ---- Mobile (≤ 768px) ---- */
+/* ============================================================
+   MOBILE RESPONSIVE (≤ 768px)
+   Rules: sidebar first → accordion below. No page h-scroll.
+   Kanban board ONLY scrolls horizontally within its wrapper.
+   ============================================================ */
 @media (max-width: 768px) {
+
+  /* ── Container ─────────────────────────────────────── */
   .app-container {
-    padding: 1rem;
+    padding: 0.75rem !important;
+    overflow-x: hidden !important;
   }
 
-  /* Header stacks vertically */
+  /* ── Header: logo + auth on line 1, nav on line 2 ─── */
   header {
-    flex-direction: column;
-    gap: 1rem;
-    align-items: flex-start;
-    padding-bottom: 1.5rem;
+    display: grid !important;
+    grid-template-columns: 1fr auto !important;
+    grid-template-rows: auto auto !important;
+    gap: 0.5rem 0.75rem !important;
+    align-items: center !important;
+    padding-bottom: 1rem !important;
+  }
+
+  .brand {
+    grid-column: 1 !important;
+    grid-row: 1 !important;
   }
 
   .brand h1 {
-    font-size: 1.35rem;
+    display: block !important;
+    font-size: 1.1rem !important;
+    white-space: nowrap !important;
   }
 
-  /* Nav links wrap and scroll horizontally */
+  .header-auth-area {
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+    margin-top: 0 !important;
+    justify-content: flex-end !important;
+    width: auto !important;
+    flex-shrink: 0 !important;
+  }
+
+  .user-header-info {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 0.4rem !important;
+  }
+
+  /* Hide text name — avatar + sign-out only on mobile */
+  .user-display-name {
+    display: none !important;
+  }
+
   .nav-links {
-    gap: 0.5rem;
-    flex-wrap: wrap;
-    width: 100%;
+    grid-column: 1 / -1 !important;
+    grid-row: 2 !important;
+    display: flex !important;
+    gap: 0.35rem !important;
+    width: 100% !important;
+    margin-top: 0 !important;
   }
 
   .nav-btn {
-    padding: 0.5rem 0.85rem;
-    font-size: 0.8rem;
-    flex: 1 1 auto;
-    justify-content: center;
-    min-width: 0;
+    flex: 1 1 0% !important;
+    justify-content: center !important;
+    padding: 0.5rem 0.4rem !important;
+    font-size: 0.73rem !important;
+    min-width: 0 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
   }
 
-  /* Glass panels tighter */
+  /* ── Dashboard grid: sidebar FIRST, accordion below ─ */
+  .dashboard-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1rem !important;
+    width: 100% !important;
+  }
+
+  /* Sidebar (Career Prefs + Progress) renders on top on mobile */
+  .sidebar-group {
+    order: -1 !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    gap: 1rem !important;
+    align-items: stretch !important;
+  }
+
+  /* Main curriculum (accordion) renders below sidebar on mobile */
+  .main-curriculum {
+    order: 1 !important;
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  /* ── Glass panel padding ─────────────────────────── */
   .glass-panel {
-    padding: 1.25rem;
-    border-radius: 12px;
-    margin-bottom: 1.25rem;
+    padding: 1rem !important;
+    border-radius: 12px !important;
+    margin-bottom: 1rem !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
   }
 
   .glass-title {
-    font-size: 1.25rem;
+    font-size: 1.15rem !important;
   }
 
-  /* Buttons full-width in tight spots */
-  .btn-primary,
-  .btn-secondary {
-    padding: 0.65rem 1.1rem;
-    font-size: 0.9rem;
-  }
-
-  /* Kanban: horizontal scroll on mobile */
-  .kanban-board {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    gap: 0.6rem;
-    padding-bottom: 1rem;
-  }
-
-  .kanban-column {
-    min-width: 200px;
-    flex: 0 0 200px;
-    padding: 0.6rem;
-    min-height: 350px;
-  }
-
-  .column-title {
-    font-size: 0.7rem;
-  }
-
-  .card-container {
-    min-height: 300px;
-  }
-
-  /* Job cards slightly smaller */
-  .job-card {
-    padding: 0.85rem;
-  }
-
-  .job-card-title {
-    font-size: 0.85rem;
-  }
-
-  .job-company {
-    font-size: 0.78rem;
-  }
-
-  /* Progress stats card stacks */
-  .progress-radial-container {
+  /* ── Accordion ───────────────────────────────────── */
+  .learning-accordion {
+    display: flex !important;
     flex-direction: column !important;
-    align-items: center;
+    gap: 0.75rem !important;
+    width: 100% !important;
   }
 
-  /* Scraper section */
-  .scraper-form-row {
-    flex-direction: column;
-    gap: 0.75rem;
+  .accordion-item {
+    width: 100% !important;
+    box-sizing: border-box !important;
+    border-radius: 10px !important;
+    position: relative !important;
   }
 
-  .scraper-form-row select,
-  .scraper-form-row input {
-    width: 100%;
+  .accordion-header {
+    padding: 1.5rem 0.85rem 0.85rem 0.85rem !important; /* Top padding leaves space for absolute week badge */
+    flex-wrap: wrap !important;
+    gap: 0.5rem !important;
   }
 
-  /* Action buttons row stacks */
-  .scraper-actions {
-    flex-direction: column;
-    gap: 0.75rem;
-  }
-
-  .scraper-actions button {
-    width: 100%;
-  }
-
-  /* Manual add + resume upload stacks */
-  .manual-resume-row {
+  /* Wrap badge + title vertically so nothing clips */
+  .header-meta {
     flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 0.25rem !important;
+    flex: 1 !important;
+    min-width: 0 !important;
   }
 
-  /* Modal full-screen on mobile */
-  .modal-content {
-    width: 95vw !important;
-    max-width: 95vw !important;
-    max-height: 90vh;
-    overflow-y: auto;
-    margin: 1rem;
+  .accordion-title-text {
+    font-size: 0.9rem !important;
+    white-space: normal !important;
+    word-break: break-word !important;
+    line-height: 1.4 !important;
   }
 
-  .modal-overlay {
-    align-items: flex-start;
-    padding-top: 2rem;
+  .week-badge-mini {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    border-top-left-radius: 10px !important; /* Matches .accordion-item radius */
+    border-bottom-right-radius: 8px !important;
+    border-top-right-radius: 0 !important;
+    border-bottom-left-radius: 0 !important;
+    margin: 0 !important;
+    padding: 0.2rem 0.5rem !important;
+    font-size: 0.65rem !important;
   }
 
-  /* Edit modal fields stack */
-  .modal-body .field-row {
-    flex-direction: column;
-    gap: 0.75rem;
-  }
-
-  /* Toast positioning */
-  .toast-container {
-    bottom: 1rem;
-    left: 1rem;
-    right: 1rem;
-    max-width: none !important;
-  }
-
-  /* Mission briefing / onboarding */
-  .mission-briefing-overlay {
-    padding: 1rem;
-  }
-
-  /* Accordion */
   .accordion-content {
-    padding: 0.75rem;
+    padding: 0.75rem !important;
   }
 
   .resources-accordion-grid {
     grid-template-columns: 1fr !important;
   }
 
-  /* Tour highlight */
-  .tour-highlight {
-    outline-offset: 4px;
+  /* ── Progress radial card ────────────────────────── */
+  .progress-radial-container {
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+    gap: 1rem !important;
   }
 
-  /* Kanban guide banner */
+  .progress-stats-text {
+    text-align: center !important;
+  }
+
+  /* ── Scraper feed cards ──────────────────────────── */
+  .feed-item {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 0.75rem !important;
+    padding: 0.85rem 0 !important;
+  }
+
+  /*
+   * Button layout:
+   * [ View Details ]  [ ⭐ Favorite ]
+   * [    Track Application (full)   ]
+   */
+  .feed-item-actions {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 0.4rem !important;
+    width: 100% !important;
+    margin-top: 0.25rem !important;
+  }
+
+  /* Third button (Track Application) spans both columns */
+  .feed-item-actions > *:last-child {
+    grid-column: 1 / -1 !important;
+  }
+
+  /* All scraper feed buttons same height and shape */
+  .scraper-feed-btn {
+    height: 36px !important;
+    font-size: 0.75rem !important;
+    padding: 0 0.6rem !important;
+    border-radius: 8px !important;
+    white-space: nowrap !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  /* ── Buttons base ────────────────────────────────── */
+  .btn-primary,
+  .btn-secondary {
+    padding: 0.6rem 1rem !important;
+    font-size: 0.85rem !important;
+  }
+
+  /* ── Kanban: horizontal scroll ONLY inside the board ── */
+  /*
+   * The page does NOT scroll horizontally.
+   * Only the .kanban-board element scrolls on its own.
+   */
+  .kanban-page-container {
+    overflow-x: hidden !important;
+    width: 100% !important;
+  }
+
+  .kanban-board-scroll-wrapper {
+    width: 100% !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    /* Scroll snap for a native feel */
+    scroll-snap-type: x mandatory !important;
+    padding-bottom: 1rem !important;
+  }
+
+  .kanban-board {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    gap: 0.85rem !important;
+    width: max-content !important;
+    /* Do NOT put overflow here — parent wrapper handles it */
+  }
+
+  .kanban-column {
+    min-width: 270px !important;
+    width: 270px !important;
+    flex: 0 0 270px !important;
+    padding: 0.85rem !important;
+    min-height: 360px !important;
+    scroll-snap-align: start !important;
+    box-sizing: border-box !important;
+  }
+
+  .column-title {
+    font-size: 0.8rem !important;
+  }
+
+  .card-container {
+    min-height: 280px !important;
+  }
+
+  .job-card {
+    padding: 0.85rem !important;
+  }
+
+  .job-card-title {
+    font-size: 0.85rem !important;
+    word-break: break-word !important;
+  }
+
+  .job-company {
+    font-size: 0.78rem !important;
+  }
+
+  /* ── Scraper filter form ─────────────────────────── */
+  .scraper-filters-form {
+    flex-direction: column !important;
+    gap: 0.65rem !important;
+  }
+
+  .scraper-filters-form > div {
+    flex: none !important; /* Remove flex basis vertical stretching gaps on mobile */
+    width: 100% !important;
+  }
+
+  .scraper-form-row {
+    flex-direction: column !important;
+    gap: 0.65rem !important;
+  }
+
+  .scraper-form-row select,
+  .scraper-form-row input {
+    width: 100% !important;
+  }
+
+  /* ── Stacked layouts ─────────────────────────────── */
+  .manual-resume-row {
+    flex-direction: column !important;
+  }
+
   .kanban-guide-banner {
-    flex-direction: column;
-    gap: 0.75rem;
+    flex-direction: column !important;
+    gap: 0.75rem !important;
     align-items: flex-start !important;
+  }
+
+  /* ── Modals ──────────────────────────────────────── */
+  .modal-content {
+    width: 95vw !important;
+    max-width: 95vw !important;
+    max-height: 90vh !important;
+    overflow-y: auto !important;
+    margin: 1rem !important;
+  }
+
+  .modal-overlay {
+    align-items: flex-start !important;
+    padding-top: 2rem !important;
+  }
+
+  .modal-body .field-row {
+    flex-direction: column !important;
+    gap: 0.75rem !important;
+  }
+
+  /* ── Toast ───────────────────────────────────────── */
+  .toast-container {
+    bottom: 1rem !important;
+    left: 0.75rem !important;
+    right: 0.75rem !important;
+    max-width: none !important;
+  }
+
+  /* ── Onboarding ──────────────────────────────────── */
+  .mission-briefing-overlay {
+    padding: 0.75rem !important;
+  }
+
+  /* ── Tour ────────────────────────────────────────── */
+  .tour-highlight {
+    outline-offset: 4px !important;
+  }
+
+  /* Tab Bar Mobile scroll behavior */
+  .tab-scroll-btn {
+    display: flex !important;
   }
 }
 
@@ -2378,7 +2718,9 @@ header {
   }
 
   .brand h1 {
-    font-size: 1.15rem;
+    display: block !important;
+    font-size: 0.9rem !important;
+    white-space: nowrap !important;
   }
 
   .glass-panel {
@@ -2409,12 +2751,6 @@ header {
   /* Job feed cards */
   .job-feed-card {
     padding: 0.85rem;
-  }
-
-  /* Progress circle smaller */
-  .svg-wrapper svg {
-    width: 90px !important;
-    height: 90px !important;
   }
 }
 

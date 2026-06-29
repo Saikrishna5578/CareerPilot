@@ -21,6 +21,7 @@ import FloatingCTA from './components/guest/FloatingCTA';
 import BackgroundDots from './components/common/BackgroundDots';
 import MissionBriefing from './components/onboarding/MissionBriefing';
 import InteractiveTour from './components/onboarding/InteractiveTour';
+import Footer from './components/common/Footer';
 
 // Default static lists to make the app work out-of-the-box (even without DB keys)
 const defaultSkills = ["Python", "SQL", "HTML/CSS"];
@@ -894,13 +895,13 @@ Please adjust your parameters in the search form (e.g. modify required skills or
         </div>
         <div className="nav-links">
           <button 
-            className={`nav-btn ${activeTab === "learning" ? "active" : ""}`}
+            className={`nav-btn nav-btn-learning ${activeTab === "learning" ? "active" : ""}`}
             onClick={() => setActiveTab("learning")}
           >
             🎓 Learning Dashboard
           </button>
           <button 
-            className={`nav-btn ${activeTab === "kanban" ? "active" : ""}`}
+            className={`nav-btn nav-btn-kanban ${activeTab === "kanban" ? "active" : ""}`}
             onClick={() => setActiveTab("kanban")}
           >
             💼 Job Applications
@@ -1022,6 +1023,8 @@ Please adjust your parameters in the search form (e.g. modify required skills or
           />
         )}
       </div>
+
+      <Footer showToast={showToast} />
 
       {/* Guest Floating CTA */}
       {effectiveIsGuest && <FloatingCTA onSignUp={() => openAuthPanel('signup')} />}

@@ -239,6 +239,17 @@ export default function LearningDashboard({
   const reaction = getProgressReaction(percentage);
   const [dashboardTab, setDashboardTab] = useState("curriculum"); // "curriculum" | "projects" | "plans" | "prep"
   const details = roadmap.details || {};
+  const tabsRef = React.useRef(null);
+
+  const scrollTabs = (direction) => {
+    if (tabsRef.current) {
+      const scrollAmount = 150;
+      tabsRef.current.scrollBy({
+        left: direction === 'left' ? -scrollAmount : scrollAmount,
+        behavior: 'smooth'
+      });
+    }
+  };
 
   return (
     <div className="dashboard-grid">
@@ -255,33 +266,39 @@ export default function LearningDashboard({
         </div>
 
         {/* Tabbed Navigation Bar */}
-        <div className="dashboard-tabs" style={{ display: 'flex', gap: '0.5rem', borderBottom: '1px solid rgba(255,255,255,0.06)', marginBottom: '1.25rem', paddingBottom: '0.25rem', overflowX: 'auto' }}>
-          {[
-            { key: 'curriculum', label: '📅 Weekly Syllabus', color: 'var(--accent-blue)' },
-            { key: 'projects', label: '🏆 Projects & Milestones', color: 'var(--accent-cyan)' },
-            { key: 'plans', label: '⏱️ Study Routine', color: 'var(--accent-purple)' },
-            { key: 'prep', label: '💼 Interview Prep', color: 'var(--accent-orange)' }
-          ].map(tab => (
-            <button 
-              key={tab.key}
-              className={`tab-link ${dashboardTab === tab.key ? 'active' : ''}`} 
-              onClick={() => setDashboardTab(tab.key)}
-              style={{ 
-                background: 'none', 
-                border: 'none', 
-                borderBottom: dashboardTab === tab.key ? `2px solid ${tab.color}` : '2px solid transparent',
-                color: dashboardTab === tab.key ? tab.color : 'var(--text-muted)', 
-                cursor: 'pointer', 
-                fontWeight: '600',
-                padding: '0.5rem 1rem',
-                fontSize: '0.85rem',
-                transition: 'all 0.2s ease',
-                whiteSpace: 'nowrap'
-              }}
-            >
-              {tab.label}
-            </button>
-          ))}
+        <div className="dashboard-tabs-wrapper">
+          <button 
+            className="tab-scroll-btn tab-scroll-left" 
+            onClick={() => scrollTabs('left')}
+            aria-label="Scroll tabs left"
+          >
+            &#8249;
+          </button>
+          
+          <div className="dashboard-tabs" ref={tabsRef}>
+            {[
+              { key: 'curriculum', label: '📅 Weekly Syllabus' },
+              { key: 'projects', label: '🏆 Projects & Milestones' },
+              { key: 'plans', label: '⏱️ Study Routine' },
+              { key: 'prep', label: '💼 Interview Prep' }
+            ].map(tab => (
+              <button 
+                key={tab.key}
+                className={`tab-link ${dashboardTab === tab.key ? 'active' : ''}`} 
+                onClick={() => setDashboardTab(tab.key)}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+
+          <button 
+            className="tab-scroll-btn tab-scroll-right" 
+            onClick={() => scrollTabs('right')}
+            aria-label="Scroll tabs right"
+          >
+            &#8250;
+          </button>
         </div>
 
         {/* Tab Contents */}
@@ -330,7 +347,7 @@ export default function LearningDashboard({
       </div>
 
       {/* Profile Config & Analytics Sidebar — FIXED WIDTH */}
-      <div className="sidebar-group" style={{ width: '320px', minWidth: '320px', maxWidth: '320px' }}>
+      <div className="sidebar-group">
         
         {/* Career Preferences — NOW ON TOP */}
         <div className="glass-panel onboarding-setup-card">
@@ -401,7 +418,7 @@ export default function LearningDashboard({
           <div className={isGuest ? 'guest-blur-content' : ''}>
             <div className="progress-radial-container">
               <div className="svg-wrapper">
-                <svg width="120" height="120" className="svg-circle">
+                <svg width="120" height="120" viewBox="0 0 120 120" className="svg-circle">
                   <circle className="circle-bg" cx="60" cy="60" r="45" />
                   <circle 
                     className="circle-progress" 

@@ -130,17 +130,6 @@ export default function KanbanBoard({
               Search live software roles. Click track to push to your pipeline.
             </p>
           </div>
-          <button 
-            className="btn-secondary" 
-            style={{ 
-              alignSelf: 'center',
-              ...(scraperEnabled ? {} : { opacity: 0.55, cursor: 'not-allowed', background: 'rgba(255,255,255,0.02)', borderColor: 'transparent' })
-            }}
-            disabled={!scraperEnabled}
-            onClick={isGuest ? () => onAuthRequired('add_job') : () => triggerScraper(scraperSkills, scraperDomain, scraperExperience, scraperWorkMode)}
-          >
-            {scraperEnabled ? "🔄 Sync Scraper Openings" : "🚫 Scraper Disabled"}
-          </button>
         </div>
 
         {/* Custom Scraper Filters Form */}
@@ -197,6 +186,30 @@ export default function KanbanBoard({
               <option value="Any" style={{ background: '#0f172a', color: '#fff' }}>Any Mode</option>
             </select>
           </div>
+          <div style={{ flex: '1 1 200px', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', gap: '0.35rem' }}>
+            <label style={{ fontSize: '0.75rem', fontWeight: '600', color: 'transparent', userSelect: 'none', display: 'block' }}>Action</label>
+            <button 
+              className="btn-primary" 
+              style={{ 
+                width: '100%', 
+                height: '38px',
+                padding: '0 1rem', 
+                boxSizing: 'border-box',
+                borderRadius: '8px',
+                fontSize: '0.85rem',
+                fontWeight: '600',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                ...(scraperEnabled ? {} : { opacity: 0.55, cursor: 'not-allowed', background: 'rgba(255,255,255,0.02)', borderColor: 'transparent' })
+              }}
+              disabled={!scraperEnabled}
+              onClick={isGuest ? () => onAuthRequired('add_job') : () => triggerScraper(scraperSkills, scraperDomain, scraperExperience, scraperWorkMode)}
+            >
+              {scraperEnabled ? "🔄 Sync Scraper Openings" : "🚫 Scraper Disabled"}
+            </button>
+          </div>
         </div>
 
         <div className="feed-panel">
@@ -241,12 +254,25 @@ export default function KanbanBoard({
                     {job.company} — <span style={{ color: "var(--text-muted)" }}>{job.location}</span>
                   </p>
                 </div>
-                <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
-                  <a href={job.apply_link} target="_blank" rel="noopener noreferrer" className="apply-link-btn" style={{ fontSize: '0.8rem', padding: '0.4rem 0.8rem' }}>View Details</a>
-                  <button className="btn-secondary" style={{ padding: "0.4rem 0.8rem", fontSize: "0.8rem" }} onClick={() => isGuest ? onAuthRequired('add_job') : addToFavorites(job)}>
+                <div className="feed-item-actions">
+                  <a 
+                    href={job.apply_link} 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="scraper-feed-btn btn-secondary platform-details"
+                  >
+                    View Details
+                  </a>
+                  <button 
+                    className="scraper-feed-btn btn-secondary" 
+                    onClick={() => isGuest ? onAuthRequired('add_job') : addToFavorites(job)}
+                  >
                     ⭐ Favorite
                   </button>
-                  <button className="btn-primary" style={{ padding: "0.4rem 0.8rem", fontSize: "0.8rem" }} onClick={() => isGuest ? onAuthRequired('add_job') : addFromFeed(job)}>
+                  <button 
+                    className="scraper-feed-btn btn-primary" 
+                    onClick={() => isGuest ? onAuthRequired('add_job') : addFromFeed(job)}
+                  >
                     Track Application
                   </button>
                 </div>
@@ -323,7 +349,8 @@ export default function KanbanBoard({
           </p>
         </div>
       )}
-      <div className="kanban-board">
+      <div className="kanban-board-scroll-wrapper">
+        <div className="kanban-board">
         {STAGES.map((stage) => {
           const stageJobs = applications.filter(app => {
             if (stage === "Favorite") {
@@ -367,7 +394,8 @@ export default function KanbanBoard({
             </div>
           );
         })}
-      </div>
+        </div>{/* end .kanban-board */}
+      </div>{/* end .kanban-board-scroll-wrapper */}
 
       {/* Lower Row: Manual Add & Resume Upload side-by-side */}
       <div className="flex-row-lower" style={{ display: 'flex', gap: '1.5rem', marginTop: '2.5rem', flexWrap: 'wrap' }}>
