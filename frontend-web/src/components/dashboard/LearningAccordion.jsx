@@ -129,10 +129,21 @@ const getCuratedResources = (topicName, defaultResources) => {
   if (resourcesList.length === 0) {
     if (defaultResources && defaultResources.length > 0) {
       defaultResources.forEach((res) => {
+        const isUrl = res.startsWith("http://") || res.startsWith("https://");
+        
+        let platform = "youtube";
+        const lowerRes = res.toLowerCase();
+        if (lowerRes.includes("w3schools.com")) platform = "w3schools";
+        else if (lowerRes.includes("freecodecamp.org")) platform = "freecodecamp";
+        else if (lowerRes.includes("mozilla.org") || lowerRes.includes("mdn")) platform = "mdn";
+        else if (lowerRes.includes("vercel.com")) platform = "vercel";
+        else if (lowerRes.includes("supabase.com")) platform = "supabase";
+        else if (isUrl && !lowerRes.includes("youtube.com") && !lowerRes.includes("youtu.be")) platform = "documentation";
+
         resourcesList.push({
           label: res,
-          url: `https://www.youtube.com/results?search_query=${encodeURIComponent(res + " tutorial")}`,
-          platform: "youtube"
+          url: isUrl ? res : `https://www.youtube.com/results?search_query=${encodeURIComponent(res + " tutorial")}`,
+          platform: platform
         });
       });
     } else {

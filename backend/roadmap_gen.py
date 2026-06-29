@@ -48,6 +48,43 @@ def generate_learning_roadmap(career_goal: str, language: str, interests: str) -
         # Initialize the Google GenAI client
         client = genai.Client(api_key=api_key)
         
+        # Define raw OpenAPI Schema dict to enforce structured JSON output on the server
+        openapi_schema = {
+            "type": "OBJECT",
+            "properties": {
+                "roadmap_title": {"type": "STRING", "description": "Title of the learning roadmap"},
+                "weeks": {
+                    "type": "ARRAY",
+                    "description": "List of roadmap items, week by week",
+                    "items": {
+                        "type": "OBJECT",
+                        "properties": {
+                            "week_number": {"type": "INTEGER", "description": "The week number, starting at 1"},
+                            "topic_name": {"type": "STRING", "description": "Title of the topic for this week"},
+                            "description": {"type": "STRING", "description": "Thorough content in Markdown: Why learn, Prerequisites, Objectives, Explanation, Analogy, Exercises, Assignment, Mini Quiz, Common mistakes, Debugging, Interview questions"},
+                            "resources": {
+                                "type": "ARRAY",
+                                "items": {"type": "STRING"},
+                                "description": "List of 3 exact free resource URLs or titles"
+                            }
+                        },
+                        "required": ["week_number", "topic_name", "description", "resources"]
+                    }
+                },
+                "milestone_projects": {"type": "STRING", "description": "Milestone project details in Markdown"},
+                "final_project": {"type": "STRING", "description": "Final project details in Markdown"},
+                "portfolio_roadmap": {"type": "STRING", "description": "Portfolio project ideas in Markdown"},
+                "interview_prep": {"type": "STRING", "description": "Interview prep guide in Markdown"},
+                "weekly_plan": {"type": "STRING", "description": "Weekly study schedule in Markdown"},
+                "daily_plan": {"type": "STRING", "description": "Daily routine details in Markdown"},
+                "next_skills": {"type": "STRING", "description": "Recommended next skills in Markdown"}
+            },
+            "required": [
+                "roadmap_title", "weeks", "milestone_projects", "final_project", 
+                "portfolio_roadmap", "interview_prep", "weekly_plan", "daily_plan", "next_skills"
+            ]
+        }
+
         prompt = f"""
         You are MentorAI, an expert Curriculum Designer, Senior Software Engineer, Technical Interviewer, Career Coach, and Learning Psychologist.
         
@@ -57,41 +94,17 @@ def generate_learning_roadmap(career_goal: str, language: str, interests: str) -
         - Interests: {interests}
         
         Rules:
-        - Assume the student has ZERO knowledge.
-        - Explain every concept using very simple English that a 5th-grade student can understand.
-        - Use real-life analogies wherever possible.
-        - Build the roadmap from beginner to industry-ready.
-        - Arrange topics strictly in prerequisite order.
-        - Never skip any important fundamentals.
-        - Recommend ONLY FREE, high-quality, and up-to-date resources. Prefer official documentation where appropriate.
-        - Recommend the best YouTube playlists, websites, interactive courses, blogs, GitHub repositories, and practice platforms.
-        - Use project-based learning. Add projects after every milestone.
-        - Mention if a topic does not require coding practice platforms like LeetCode and recommend better alternatives.
-        
-        For each week, fill the "description" field with a thorough and beautifully structured markdown containing:
-        - Why learn it
-        - Prerequisites
-        - Learning Objectives
-        - Beginner-friendly Explanation
-        - Real-life Analogy
-        - Exercises
-        - Assignment
-        - Mini Quiz
-        - Common Beginner Mistakes & Debugging Tips
-        - Typical Interview Questions
-        - Estimated Learning Time (e.g. "6 hours")
-        - Ready-to-Move Checklist
-        
-        Provide high-yield resource details in the "resources" field.
-        
-        In the top-level fields of the JSON schema, generate detailed Markdown text for the following sections:
-        - milestone_projects: Milestone Project, Skills Acquired, Portfolio Value, and Revision Checklist.
-        - final_project: Features, Tech Stack, Learning Outcomes, and Resume Value.
-        - portfolio_roadmap: Suggest Beginner, Intermediate, Advanced Projects, and Open Source Contribution Ideas.
-        - interview_prep: Core Interview Topics, Coding Practice Platforms, Mock Interview Resources, Resume & GitHub Tips.
-        - weekly_plan: Generate a realistic week-by-week study schedule.
-        - daily_plan: Generate a daily routine (Learning, Coding, Revision, Project Work, Breaks).
-        - next_skills: Recommend next skills and explain why they should be learned.
+        1. Let the curriculum span as many weeks as needed to master the skill from zero to industry-ready.
+        2. Keep weekly descriptions concise, engaging, and high-yield.
+        3. Inside the weekly "description" field, include ONLY:
+           - A brief overview of the week's topic.
+           - A compelling real-world example of where this topic/concept is used in a real product (e.g. Spotify, Instagram, Netflix, Uber, YouTube) to excite the student.
+           - DO NOT include assignments, quizzes, study routines, debugging tips, or common mistakes here.
+        4. In the "resources" field, provide exactly 3 high-quality free resource URLs.
+        5. Simplify all supplementary top-level sections to keep the token size compact:
+           - "milestone_projects" & "final_project": Just a short project idea or a practical problem statement.
+           - "weekly_plan" & "daily_plan": Keep it to 1-2 sentences of high-level tips.
+           - "portfolio_roadmap", "interview_prep" & "next_skills": Actionable bulleted lists with no filler text.
         """
         
         log_event("INFO", "ROADMAP_GEN", f"Requesting roadmap from Gemini API for {career_goal}...")
@@ -100,7 +113,7 @@ def generate_learning_roadmap(career_goal: str, language: str, interests: str) -
             contents=prompt,
             config={
                 "response_mime_type": "application/json",
-                "response_schema": FullRoadmap
+                "response_schema": openapi_schema
             }
         )
         logger.info(f'Prompt to GEMINI: {prompt}')
